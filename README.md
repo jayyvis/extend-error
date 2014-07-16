@@ -2,23 +2,27 @@
 
 If you have ever tried to create custom error types in Node.js, you wish you had this little library :-) 
 
-In your app.js, just require('extend-error'). It will add extend method to Error type.
+In your app.js, just ```require('extend-error')```. It will provide you an extend() method for the Error type.
 
 
 ```
 Error.extend()
 ```
 
-
-### syntax
-extend() takes two arguments (subTypeName, errorCode) and returns the newly created error type. 'errorCode' is optional.
-
-
-### examples
+### example
 
 ```
 var MyError = Error.extend('MyError');
 ```
+
+
+### syntax
+- extend() takes two arguments : subTypeName & errorCode [optional]
+- it returns the newly created error type
+
+
+### more examples for a web app
+
 
 something useful
 
@@ -34,8 +38,9 @@ var HttpNotFound = ClientError.extend('HttpNotFoundError', 404);
 var HttpUnauthorized = ClientError.extend('HttpUnauthorized', 401);
 ```
 
-### throw errors
+### throwing errors
 
+```
 throw new AppError('unable to connect db due to error: ' + err);
 
 throw new ClientError({'message':'required field missing', field: 'email'})
@@ -43,23 +48,27 @@ throw new ClientError({'message':'required field missing', field: 'email'})
 throw new HttpNotFound('no post found with id: ' + id);
 
 throw new HttpNotFound({'message': 'no such post', 'id': id});
-
+```
 
 ### don't worry when you forget 'new'
 
+```
 throw ClientError('bad request');
-
+```
 
 ### instanceof
 
-in controller
+throw an error in controller
 
 ```
 var err = HttpNotFound('user profile not found');
-throw err; (or) callback(err)
+
+throw err; 
+(or)
+callback(err)
 ```
 
-and in global error handler (in case of express.js error middleware)
+handle it easily in global error handler (in case of express.js error middleware)
 
 ```
 if (err instanceof ClientError) {
