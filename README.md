@@ -1,19 +1,23 @@
 # extend-error
 
-If you have ever tried to create custom error types in Node.js, you wish you had this little library :-) 
-
-In your app.js, just ```require('extend-error')```. It will provide you an extend() method for the Error type.
-
-
-```
-Error.extend()
-```
-
-### example
+Ever tried to create custom error types in Node.js and wished it should be this simple?
 
 ```
 var MyError = Error.extend('MyError');
 ```
+
+```
+throw MyError('wow')
+```
+
+### installation
+
+```
+npm install extend-error
+```
+
+and in your app.js, just ```require('extend-error')```. It will provide you an extend() method for the Error type.
+
 
 
 ### syntax
