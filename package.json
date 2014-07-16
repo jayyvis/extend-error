@@ -1,0 +1,10 @@
+{ "name": "extend-error",
+  "version": "0.1.0",
+  "description": "Easily define custom error types in Node.js",
+  "engine": [ "node >=0.2.0" ],
+  "author": "Jayy Vis <jayyvis@gmail.com>",
+  "repository":
+  { "type" : "git",
+    "url" : "http://github.com/jayyvis/extend-error.git"
+  },
+}
