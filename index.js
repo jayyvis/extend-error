@@ -16,11 +16,7 @@ Error.extend = function(subTypeName, errorCode /*optional*/) {
 	//define new error type
 	
 	var SubType = (function(message) {
-		//protection against forgetting 'new' while throwing errors
-		/*
-		 * throw new AppError('reason')
-		 * throw AppError('reason')
-		 */ 
+		//handle constructor call without 'new'
 		if (! (this instanceof SubType)) {
 			return new SubType(message);
 		}
@@ -32,6 +28,9 @@ Error.extend = function(subTypeName, errorCode /*optional*/) {
 		this.name = subTypeName; 
 		this.code = errorCode;
 		this.message = message || '';
+		
+		//fix the error message in trace 
+		this.stack = this.stack.replace('Error', this.toString());
 	});
 	
 	//inherit the base prototype chain
@@ -40,7 +39,7 @@ Error.extend = function(subTypeName, errorCode /*optional*/) {
 	
 	//override the toString method to error type name and inspected message (to expand objects)
 	SubType.prototype.toString = function() {
-		return 'Error:' + this.name + ': ' + util.inspect(this.message);
+		return this.name + ': ' + util.inspect(this.message);
 	};
 	
 	//attach extend() to the SubType to make it extendable further
