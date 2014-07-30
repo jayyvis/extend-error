@@ -1,6 +1,6 @@
 { 
   "name": "extend-error",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Easily define custom error types in Node.js",
   "author": "Jayy Vis <jayyvis@gmail.com>",
   "dependencies": {},  
