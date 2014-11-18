@@ -21,16 +21,13 @@ Error.extend = function(subTypeName, errorCode /*optional*/) {
 			return new SubType(message);
 		}
 		
-		//include stack trace in error object
-		Error.captureStackTrace(this, this.constructor);
-		
 		//populate error details
 		this.name = subTypeName; 
 		this.code = errorCode;
 		this.message = message || '';
 		
-		//fix the error message in trace 
-		this.stack = this.stack.replace('Error', this.toString());
+		//include stack trace in error object
+		Error.captureStackTrace(this, this.constructor);
 	});
 	
 	//inherit the base prototype chain
