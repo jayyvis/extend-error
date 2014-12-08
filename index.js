@@ -1,7 +1,3 @@
-var util = require('util');
-var assert = require('assert');
-
-
 /**
  * Add extend() method to Error type
  * 
@@ -11,7 +7,7 @@ var assert = require('assert');
  */
 
 Error.extend = function(subTypeName, errorCode /*optional*/) {
-	assert(subTypeName, 'subTypeName is required');
+	if(subTypeName === undefined) throw new Error('subTypeName is required');
 	
 	//define new error type
 	
@@ -31,12 +27,12 @@ Error.extend = function(subTypeName, errorCode /*optional*/) {
 	});
 	
 	//inherit the base prototype chain
-	util.inherits(SubType, this);
+	SubType.prototype = this;
 	
 	
 	//override the toString method to error type name and inspected message (to expand objects)
 	SubType.prototype.toString = function() {
-		return this.name + ': ' + util.inspect(this.message);
+		return this.name + ': ' + this.message;
 	};
 	
 	//attach extend() to the SubType to make it extendable further
@@ -44,4 +40,3 @@ Error.extend = function(subTypeName, errorCode /*optional*/) {
 	
 	return SubType;
 };
-
