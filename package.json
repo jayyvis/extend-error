@@ -1,13 +1,19 @@
-{ 
+{
   "name": "extend-error",
   "version": "0.0.2",
   "description": "Easily define custom error types in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/mocha --reporter spec"
+  },
   "author": "Jayy Vis <jayyvis@gmail.com>",
-  "dependencies": {},  
+  "devDependencies": {
+    "mocha": "*"
+  },
   "repository": {
     "type" : "git",
     "url" : "http://github.com/jayyvis/extend-error.git"
   },
-  "license": "MIT"  
+  "license": "MIT"
 }
 
