@@ -1,47 +1,76 @@
+'use strict';
+
 var util = require('util');
 var assert = require('assert');
 
-
 /**
- * Add extend() method to Error type
- * 
+ * Create subtype of Error object
+ *
+ * @param BaseType [optional] defaults to {Error}
  * @param subTypeName
  * @param errorCode [optional]
  * @returns {SubType}
  */
+function extendError(BaseType, subTypeName, errorCode /*optional*/) {
+	if (typeof BaseType === 'string') {
+		errorCode = subTypeName;
+		subTypeName = BaseType;
+		BaseType = Error;
+	}
 
-Error.extend = function(subTypeName, errorCode /*optional*/) {
+	if (!this) {
+		if (typeof BaseType !== 'function') {
+			throw new Error('`BaseType` must be a Function');
+		}
+
+		return extendError.apply(BaseType, arguments);
+	}
+
 	assert(subTypeName, 'subTypeName is required');
-	
-	//define new error type
-	
-	var SubType = (function(message) {
-		//handle constructor call without 'new'
-		if (! (this instanceof SubType)) {
+
+	// Define the new type
+	function SubType(message) {
+		// Handle constructor called without `new`
+		if (!(this instanceof SubType)) {
 			return new SubType(message);
 		}
-		
-		//populate error details
-		this.name = subTypeName; 
-		this.code = errorCode;
+
+		// Populate error details
+		this.name = subTypeName;
+		// Only set `this.code` if a code is defined for the type (to prevent
+		// "{code:undefined}" when stringifying)
+		if (errorCode) {
+			this.code = errorCode;
+		}
 		this.message = message || '';
-		
-		//include stack trace in error object
+
+		// Include stack trace in error object
 		Error.captureStackTrace(this, this.constructor);
-	});
-	
-	//inherit the base prototype chain
+	}
+
+	// Inherit the base prototype chain
 	util.inherits(SubType, this);
-	
-	
-	//override the toString method to error type name and inspected message (to expand objects)
-	SubType.prototype.toString = function() {
+
+	// Override the toString method to error type name and inspected message (to
+	// expand objects)
+	SubType.prototype.toString = function toString() {
 		return this.name + ': ' + util.inspect(this.message);
 	};
-	
-	//attach extend() to the SubType to make it extendable further
-	SubType.extend = this.extend;
-	
+
+	// Attach extend() to the SubType to make it extendable further (but only if
+	// extend has been monkeypatched onto the Error object).
+	if (this.extend) {
+		SubType.extend = this.extend;
+	}
+
 	return SubType;
+}
+
+/**
+ * Add `extend()` method to {Error} type
+ */
+extendError.monkeypatch = function() {
+	Error.extend = extendError;
 };
 
+module.exports = extendError;
