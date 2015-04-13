@@ -17,7 +17,7 @@ describe('functional', function() {
 describe('monkeypatched', function() {
 	var errors = require('../test-fixtures/http-errors-monkeypatched');
 	tests(errors);
-	assert.ok(typeof errors.ClientError.extend === 'function', 'ClientError does not have an extend method');
+	assert.ok(typeof errors.ClientError.extend === 'function', 'ClientError has an extend method');
 });
 
 function tests(errors) {
