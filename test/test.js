@@ -20,6 +20,11 @@ describe('monkeypatched', function() {
 	assert.ok(typeof errors.ClientError.extend === 'function', 'ClientError has an extend method');
 });
 
+describe('compatibility', function() {
+	var errors = require('../test-fixtures/http-errors-previousformat');
+	tests(errors);
+});
+
 function tests(errors) {
 	describe('instantiation', function() {
 		it('should work with new operator', function() {

@@ -9,6 +9,9 @@ var util = require('util');
  * Create subtype of Error object
  *
  * @param {Object} BaseType [optional] defaults to {Error}
+ * @param {string} subTypeName for backward compatibility. use
+ * `options.subTypeName`
+ * @param {number} errorCode for backward compatibility. use `options.code`
  * @param {Object} options
  * @param {string} options.subTypeName
  * @param {Function} options.parseFn parses the parameters passed to the
@@ -23,10 +26,18 @@ var util = require('util');
  * that corresponds to this exception
  * @returns {SubType}
  */
-function extendError(BaseType, options) {
+function extendError(BaseType, subTypeName, errorCode, options) {
 	if (typeof BaseType !== 'function') {
-		options = BaseType;
+		options = errorCode;
+		errorCode = subTypeName;
+		subTypeName = BaseType;
 		BaseType = Error;
+	}
+
+	if (typeof subTypeName === 'object') {
+		options = subTypeName;
+		subTypeName = undefined;
+		errorCode = undefined;
 	}
 
 	if (!this) {
@@ -37,17 +48,18 @@ function extendError(BaseType, options) {
 		return extendError.apply(BaseType, arguments);
 	}
 
-	if (!options) {
-		throw new Error('`options` is required');
+	subTypeName = subTypeName || options.subTypeName;
+	if (!subTypeName) {
+		throw new Error('`subTypeName` is required');
 	}
 
-	if (!options.subTypeName) {
-		throw new Error('`options.subTypeName` is required');
-	}
+	var parseFn = options && options.parseFn || identity;
+	var properties = (options && options.properties) ? cloneDeep(options.properties) : {};
+	var toString = options && options.toString;
 
-	var subTypeName = options.subTypeName;
-	var parseFn = options.parseFn || identity;
-	var properties = options.properties ? cloneDeep(options.properties) : {};
+	if (errorCode) {
+		properties.code = errorCode;
+	}
 
 	// Define the new type
 	function SubType(message) {
@@ -73,7 +85,7 @@ function extendError(BaseType, options) {
 
 	// Override the toString method to error type name and inspected message (to
 	// expand objects)
-	SubType.prototype.toString = options.toString || function toString() {
+	SubType.prototype.toString = toString || function toString() {
 		return this.name + ': ' + util.inspect(this.message);
 	};
 
