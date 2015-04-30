@@ -19,8 +19,6 @@ var util = require('util');
  * of the {SubType} instance. One possible use might be to pass an
  * {HttpResponse} Object into the error constructor and assign the response as
  * one of the error's properties.
- * @param {Function} options.toString Alternate `toString()` method to attach to
- * the {SubType}'s prototype.
  * @param {Object} options.properties place properties here that should be
  * attached to every instance of {SubType}. For example, the HTTP status code
  * that corresponds to this exception
@@ -53,9 +51,7 @@ function extendError(BaseType, subTypeName, errorCode, options) {
 		throw new Error('`subTypeName` is required');
 	}
 
-	var parseFn = options && options.parseFn || identity;
 	var properties = (options && options.properties) ? cloneDeep(options.properties) : {};
-	var toString = options && options.toString;
 
 	if (errorCode) {
 		properties.code = errorCode;
@@ -68,9 +64,17 @@ function extendError(BaseType, subTypeName, errorCode, options) {
 			return new SubType(message);
 		}
 
-		this.name = subTypeName;
+		Object.defineProperties(this, {
+			name: {
+				enumerable: false,
+				value: subTypeName
+			},
+			message: {
+				enumerable: false,
+				value: this.parseFn(message || '')
+			}
+		});
 
-		this.message = parseFn(message || '');
 
 		forOwn(properties, function(value, key) {
 			this[key] = value;
@@ -83,11 +87,7 @@ function extendError(BaseType, subTypeName, errorCode, options) {
 	// Inherit the base prototype chain
 	util.inherits(SubType, this);
 
-	// Override the toString method to error type name and inspected message (to
-	// expand objects)
-	SubType.prototype.toString = toString || function toString() {
-		return this.name + ': ' + util.inspect(this.message);
-	};
+	SubType.prototype.parseFn = options && options.parseFn || BaseType.prototype.parseFn || identity;
 
 	// Attach extend() to the SubType to make it further extendable (but only if
 	// `extend()` has been monkeypatched onto the Error object).
