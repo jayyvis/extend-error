@@ -11,9 +11,13 @@
     "mocha": "*"
   },
   "repository": {
-    "type" : "git",
-    "url" : "http://github.com/jayyvis/extend-error.git"
+    "type": "git",
+    "url": "http://github.com/jayyvis/extend-error.git"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lodash.clonedeep": "~3.0.0",
+    "lodash.forown": "~3.0.1",
+    "lodash.identity": "~3.0.0"
+  }
 }
-

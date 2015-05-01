@@ -16,19 +16,23 @@ throw MyError('wow')
 npm install extend-error
 ```
 
-and in your app.js, just ```require('extend-error')```. It will provide you an extend() method for the Error type.
-
-
+and in your app.js, just ```require('extend-error').polyfill()```. It will provide you an extend() method for the Error type.
 
 ### syntax
 - extend() takes two arguments : subTypeName & errorCode [optional]
 - it returns the newly created error type
 
+#### polyfilling
+
+All of the examples here assume you ran `polyfill()`. If you're not comfortable with modifying native objects, you can use `extendError()` directly.
+
+```
+var extendError = require('extend-error');
+var ClientError = extendError('ClientError', 400);
+var HttpNotFound = extendError(ClientError, HttpNotFound, 404);
+```
 
 ### more examples for a web app
-
-
-something useful
 
 ```
 var AppError = Error.extend('AppError', 500);
@@ -67,7 +71,7 @@ throw an error in controller
 ```
 var err = HttpNotFound('user profile not found');
 
-throw err; 
+throw err;
 (or)
 callback(err)
 ```
@@ -85,4 +89,3 @@ if (err instanceof ClientError) {
 }
 
 ```
-
