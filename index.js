@@ -24,7 +24,9 @@ Error.extend = function(subTypeName, errorCode /*optional*/) {
 		//populate error details
 		this.name = subTypeName; 
 		this.code = errorCode;
-		this.message = message || '';
+		if (typeof(message) !== 'undefined') {
+			this.message = message;
+		}
 		
 		//include stack trace in error object
 		Error.captureStackTrace(this, this.constructor);
