@@ -2,59 +2,53 @@
  * mocha test cases
  */
 
-var errors = require('../http-errors');
-
 var assert = require('assert');
+var extend = require('../');
+var http = require('http');
+
+
+var NotFound = extend(extend.CodedError, {name: 'NotFound', message: http.STATUS_CODES[404], code: 404});
+var InternalServerError = extend(extend.CodedError, {name: 'InternalServerError', message: http.STATUS_CODES[500], code: 500});
 
 
 describe('instantiation', function() {
-	it('should work with new operator', function() {
-		var err = new errors.AppError('problem');
-		assert.ok(err instanceof errors.AppError);
-	});
-	
-	it('should work without new operator', function() {
-		var err = errors.AppError('problem');
-		assert.ok(err instanceof errors.AppError);
-	});
+    it('should work with new operator', function() {
+        var err = new NotFound('not found');
+        assert.ok(err instanceof NotFound);
+        assert.ok(err instanceof extend.CodedError);
+        assert.ok(err instanceof Error);
+    });
+
+    it('should work without new operator', function() {
+        var err = NotFound('not found');
+        assert.ok(err instanceof NotFound);
+        assert.ok(err instanceof extend.CodedError);
+        assert.ok(err instanceof Error);
+    });
+
+    it('should work like original error', function () {
+        var err = new NotFound("not found");
+        assert.ok(err.message == "not found");
+    });
 });
 
 
-describe('inheritance', function() {
-	it('should maintain prototype hierarchy with one level', function() {
-		var err = new errors.ClientError('email required');
-		
-		assert.ok(err instanceof errors.ClientError, 'ClientError is not an instance of ClientError');
-		assert.ok(err instanceof Error, 'ClientError is not an instance of Error');
-	});
-	
-	it('should maintain prototype hierarchy with two levels', function() {
-		var notfound = new errors.HttpNotFound('item not found');
-		
-		assert.ok(notfound instanceof errors.HttpNotFound, 'HttpNotFound is not an instance of HttpNotFound');
-		assert.ok(notfound instanceof errors.ClientError, 'HttpNotFound is not an instance of ClientError');
-		assert.ok(notfound instanceof Error, 'HttpNotFound is not an instance of Error');
-	});
+describe('properties', function() {
+    it('should have message', function() {
+        var err = new NotFound('not found');
+        assert.equal(err.message, 'not found');
+
+        err = new NotFound();
+        assert.equal(err.message, http.STATUS_CODES[404]);
+    });
+
+    it('should have code', function() {
+        var err = new NotFound();
+        assert.equal(err.code, 404);
+    });
+
+    it('should have other property', function() {
+        var err = new NotFound({other: 'yes'});
+        assert.equal(err.other, 'yes');
+    });
 });
-
-
-describe('error details', function() {
-	it('should have message', function() {
-		var err;
-		
-		err = new errors.ClientError('name required');
-		assert.equal(err.message, 'name required');
-		
-		err = new errors.ClientError();
-		assert.equal(err.message, '');
-	});
-	
-	it('should have code', function() {
-		var err = new errors.ClientError();
-		assert.equal(err.code, 400);
-	});
-	
-});
-
-
-

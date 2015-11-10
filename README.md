@@ -2,87 +2,66 @@
 
 Ever tried to create custom error types in Node.js and wished it should be this simple?
 
-```
-var MyError = Error.extend('MyError');
-```
+    var MyError = extend(Error, 'MyError');
+    throw MyError('wow')
 
-```
-throw MyError('wow')
-```
+### Installation
 
-### installation
+    npm install tangxinfa/extend-error
 
-```
-npm install extend-error
-```
+#### Test
 
-and in your app.js, just ```require('extend-error')```. It will provide you an extend() method for the Error type.
+    npm test
 
+### Documentation
 
+    /**
+     * extend Error type.
+     *
+     * @param BaseError base error type to extend. Must be Error or subclass of Error.
+     * @param extendedErrorOptions extended error type options.
+     *        Object:
+     *          - name     [required] string, extended error type name.
+     *          - message  [optional] string, default error message.
+     *          - toString [optional] function, overwrite toString method.
+     *        String: extended error type name.
+     * @return Extended error type.
+     */
+     function extend(BaseError, extendedErrorOptions)
 
-### syntax
-- extend() takes two arguments : subTypeName & errorCode [optional]
-- it returns the newly created error type
+    /**
+     * CodedError type
+     *   - name: CodedError
+     *   - code: Error code.
+     */
+    var CodedError = extend(Error, {...});
 
+### Examples for a web app
 
-### more examples for a web app
+#### Extend error types
 
+    var http = require('http');
+    var util = require('util');
+    var extend = require('extend-error');
 
-something useful
+    var AppError = extend(Error, "AppError");
+    var NotFound = extend(extend.CodedError, {name: 'NotFoundError', message: http.STATUS_CODES[404], code: 404});
+    var InternalServerError = extend(extend.CodedError, {name: 'InternalServerError', message: http.STATUS_CODES[500], code: 500});
 
-```
-var AppError = Error.extend('AppError', 500);
-var ClientError = Error.extend('ClientError', 400);
-```
+#### Throw errors
 
-extend ClientError further for specific http types
+    throw new NotFound({resource: '/subject/1'});
 
-```
-var HttpNotFound = ClientError.extend('HttpNotFoundError', 404);
-var HttpUnauthorized = ClientError.extend('HttpUnauthorized', 401);
-```
+    // 'new' keyword is optional.
+    throw InternalServerError();
 
-### throwing errors
+    // compitable with raw Error constructor.
+    throw InternalServerError('connection closed);
 
-```
-throw new AppError('unable to connect db due to error: ' + err);
+#### Handle errors
 
-throw new ClientError({'message':'required field missing', field: 'email'})
-
-throw new HttpNotFound('no post found with id: ' + id);
-
-throw new HttpNotFound({'message': 'no such post', 'id': id});
-```
-
-### don't worry when you forget 'new'
-
-```
-throw ClientError('bad request');
-```
-
-### instanceof
-
-throw an error in controller
-
-```
-var err = HttpNotFound('user profile not found');
-
-throw err; 
-(or)
-callback(err)
-```
-
-handle it easily in global error handler (in case of express.js error middleware)
-
-```
-if (err instanceof ClientError) {
-	//send out the actual message
-	res.send(err.code, err.message);
-} else {
-	//send out a generic message
-	res.send(500, 'oops! something went wrong');
-	log.error(err);
-}
-
-```
-
+    if (err instanceof NotFound) {
+        res.send(err.code, "Please create subject(" + err.resource + ") first.");
+    } else {
+        res.send(err.code, err.message);
+    }
