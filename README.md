@@ -43,7 +43,8 @@ Ever tried to create custom error types in Node.js and wished it should be this 
     var http = require('http');
     var util = require('util');
     var extend = require('extend-error');
-    
+
+    var AppError = extend(Error, "AppError");
     var NotFound = extend(extend.CodedError, {name: 'NotFoundError', message: http.STATUS_CODES[404], code: 404});
     var InternalServerError = extend(extend.CodedError, {name: 'InternalServerError', message: http.STATUS_CODES[500], code: 500});
 
@@ -54,10 +55,13 @@ Ever tried to create custom error types in Node.js and wished it should be this 
     // 'new' keyword is optional.
     throw InternalServerError();
 
+    // compitable with raw Error constructor.
+    throw InternalServerError('connection closed);
+
 #### Handle errors
 
     if (err instanceof NotFound) {
-        res.send(err.code, "Please create subject" + err.resource + ") first.");
+        res.send(err.code, "Please create subject(" + err.resource + ") first.");
     } else {
         res.send(err.code, err.message);
     }
